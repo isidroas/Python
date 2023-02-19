@@ -14,11 +14,11 @@ class Node:
         self.right: Node | None = None
 
     def __repr__(self) -> str:
-        from pprint import pformat
+        from prettyprinter import pformat
 
         if self.left is None and self.right is None:
             return str(self.value)
-        return pformat({f"{self.value}": (self.left, self.right)}, indent=1)
+        return pformat({f"{self.value}": (self.left, self.right)}, indent=1, width = 40)
 
 
 class BinarySearchTree:
@@ -44,6 +44,8 @@ class BinarySearchTree:
 
     def is_right(self, node: Node) -> bool:
         if node.parent and node.parent.right:
+            # TODO: The operator '==' only works if both have the same `id()`
+            # TODO: self is not used. Move it to Node class property
             return node == node.parent.right
         return False
 
@@ -128,12 +130,12 @@ class BinarySearchTree:
             elif node.right is None:  # Has only left children
                 self.__reassign_nodes(node, node.left)
             else:
-                tmp_node = self.get_max(
+                predecessor = self.get_max(
                     node.left
                 )  # Gets the max value of the left branch
-                self.remove(tmp_node.value)  # type: ignore
+                self.remove(predecessor.value)  # TODO: It's a overhead to search again
                 node.value = (
-                    tmp_node.value  # type: ignore
+                    predecessor.value  # type: ignore
                 )  # Assigns the value to the node to delete and keep tree structure
 
     def preorder_traverse(self, node: Node | None) -> Iterable:
@@ -206,6 +208,10 @@ def binary_search_tree() -> None:
 
     # Prints all the elements of the list in order traversal
     print(t)
+    six = t.search(6)
+    assert t.is_right(six)
+    one = t.search(1)
+    assert not t.is_right(one)
 
     if t.search(6) is not None:
         print("The value 6 exists")
@@ -230,3 +236,4 @@ if __name__ == "__main__":
     import doctest
 
     doctest.testmod(verbose=True)
+    binary_search_tree()
