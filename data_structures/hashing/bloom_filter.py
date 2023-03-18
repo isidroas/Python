@@ -1,5 +1,11 @@
 from hashlib import sha1
 
+LOG_ADD = """\
+[exists] old =    {}
+         added =  {}
+         new =    {}
+"""
+
 
 class Bloom:
     def __init__(self, size=8):
@@ -8,27 +14,43 @@ class Bloom:
         self.mask = 2**size - 1
 
     def add(self, value):
+        old = self.bitstring
         new = self.hash(value)
         self.bitstring |= new
+        print(
+            f"""\
+[add] value = {value}
+      old =   {self.format_bin(old)}
+      added = {self.format_bin(new)}
+      new =   {self.format_bin(self.bitstring)}
+"""
+        )
 
     def exists(self, value):
         h = self.hash(value)
-        print(
-            "[exists]\th = \t\t{}\n\t\tbistring = \t{}\n".format(
-                self.format_bin(h), self.format_bin(self.bitstring)
-            )
-        )
+        and_bitwise = h & self.bitstring
         # warning: h could be zero
-        return (h & self.bitstring) == h
+        res = and_bitwise == h
+
+        print(
+            f"""\
+[exists] value =    {value}
+         ask =      {self.format_bin(h)}
+         bistring = {self.format_bin(self.bitstring)}
+         and =      {self.format_bin(and_bitwise)}
+         res =      {res}
+"""
+        )
+        return res
 
     def format_bin(self, value):
         res = bin(value)[2:]
         return res.zfill(self.size)
 
     def hash(self, value):
-        b =sha1(value.encode()).digest()
-        #new = int.from_bytes(b)
-        new = b[0]
+        b = sha1(value.encode()).digest()
+        new = int.from_bytes(b, 'big')
+        #new = b[0]
         # strip bytes
         new &= self.mask
         return new
@@ -43,4 +65,4 @@ def test():
     assert b.exists("avatar")
 
     assert not b.exists("parasite")
-    assert not b.exists("pulp fiction")
+    assert b.exists("pulp fiction")
