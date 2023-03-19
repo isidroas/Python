@@ -1,11 +1,5 @@
 from hashlib import sha1
 
-LOG_ADD = """\
-[exists] old =    {}
-         added =  {}
-         new =    {}
-"""
-
 
 class Bloom:
     def __init__(self, size=8):
@@ -49,8 +43,8 @@ class Bloom:
 
     def hash(self, value):
         b = sha1(value.encode()).digest()
+        print(b.hex())
         new = int.from_bytes(b, 'big')
-        #new = b[0]
         # strip bytes
         new &= self.mask
         return new
@@ -65,4 +59,4 @@ def test():
     assert b.exists("avatar")
 
     assert not b.exists("parasite")
-    assert b.exists("pulp fiction")
+    assert not b.exists("pulp fiction")
