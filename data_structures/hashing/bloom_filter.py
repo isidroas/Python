@@ -93,7 +93,9 @@ def test_probability(m=64, n=20):
     print(f"{expected_probability=}")
     print(f"{expected_probability_wikipedia=}")
 
-    assert abs(expected_probability-fail_rate) <= 0.05 # 5% margin calculated experiementally
+    assert (
+        abs(expected_probability - fail_rate) <= 0.05
+    )  # 5% margin calculated experiementally
 
 
 if __name__ == "__main__":
