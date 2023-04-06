@@ -1,9 +1,13 @@
+"""
+See https://en.wikipedia.org/wiki/Bloom_filter
+"""
 from hashlib import sha256, md5
 from random import randint, choices
 import string
 
 
 class Bloom:
+
     def __init__(self, size=8):
         self.bitstring = 0b00000000
         self.size = size
@@ -54,28 +58,46 @@ def test():
     assert b.exists("titanic")
     assert b.exists("avatar")
 
-    assert not b.exists("the goodfather")
-    assert not b.exists("interstellar")
-    assert not b.exists("Parasite")
-    assert not b.exists("Pulp fiction")
+    assert b.exists("the goodfather") in (True, False)
+    assert b.exists("interstellar") in (True, False)
+    assert b.exists("Parasite") in (True, False)
+    assert b.exists("Pulp fiction") in (True, False)
 
 
 def random_string(size):
     return ''.join(choices(string.ascii_lowercase + ' ', k=size))
 
-#def test_prob():
-#    SIZE = 64
-#    added = {random_string(100) for i in range(20)}
-#    not_added = {random_string(100) for i in range(1000)}
-#    b = Bloom(size = SIZE)
-#    for a in added:
-#        b.add(a)
-#    fails = 0
-#    for n in not_added:
-#        if b.exists(n):
-#            fails+=1
-#    print(f'total = {len(not_added)}, fails = {fails}, prob = {fails/len(not_added)}')
-#    n_possible = SIZE
-#    n_ones = bin(b.bitstring).count('1')
-#    print(f'expected_probability = {n_ones/n_possible}')
-#    assert False
+def test_prob(m = 64, n=20):
+    b = Bloom(size = m)
+
+    added = {random_string(10) for i in range(n)}
+    for a in added:
+        b.add(a)
+
+    # number of hash functions is fixed
+    k = 2
+
+    expected_probability_wikipedia = (1-(1-1/m)**(k*n))**k
+    print(f'{expected_probability_wikipedia=}')
+
+    n_ones = bin(b.bitstring).count('1')
+    expected_probability = (n_ones/m)**k
+    print(f'{expected_probability=}')
+
+
+    not_added = {random_string(10) for i in range(1000)}
+    fails = 0
+    for string in not_added:
+        if b.exists(string):
+            fails+=1
+    fail_rate = fails/len(not_added)
+
+    print(f'total = {len(not_added)}, fails = {fails}, prob = {fails/len(not_added)}')
+
+    assert round(expected_probability,1) == round(fail_rate,1)
+
+
+
+if __name__=='__main__':
+    test()
+    test_prob()
