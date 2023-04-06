@@ -13,9 +13,9 @@ class Bloom:
         self.bitstring |= new
         print(
             f"""\
-[add] value =       {value}
-      added =       {self.format_bin(new)}
-      bitstring =   {self.format_bin(self.bitstring)}
+[add] value =      {value}
+      hash =       {self.format_bin(new)}
+      filter =     {self.format_bin(self.bitstring)}
 """
         )
 
@@ -25,10 +25,10 @@ class Bloom:
 
         print(
             f"""\
-[exists] value =    {value}
-         ask =      {self.format_bin(h)}
-         bistring = {self.format_bin(self.bitstring)}
-         res =      {res}
+[exists] value =   {value}
+         hash =    {self.format_bin(h)}
+         filter =  {self.format_bin(self.bitstring)}
+         res =     {res}
 """
         )
         return res
