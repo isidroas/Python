@@ -45,12 +45,16 @@ def dijkstra(graph, start, end):
     """
 
     heap = [(0, start)]  # cost from start node,end node
+    print(f'{heap=}')
     visited = set()
+    print(f'{visited=}')
     while heap:
         (cost, u) = heapq.heappop(heap)
+        print(f'{heap=}')
         if u in visited:
             continue
         visited.add(u)
+        print(f'{visited=}')
         if u == end:
             return cost
         for v, c in graph[u]:
@@ -58,8 +62,16 @@ def dijkstra(graph, start, end):
                 continue
             next_item = cost + c
             heapq.heappush(heap, (next_item, v))
+            print(f'{heap=}')
     return -1
 
+
+G4 = {
+    "START": [ ( "A", 6 ), ("B", 2) ],
+    "A": [ ("FIN", 1) ],
+    "B": [("FIN", 5), ("A", 3)],
+    "FIN": [],
+}
 
 G = {
     "A": [["B", 2], ["C", 5]],
@@ -103,16 +115,19 @@ G3 = {
     "G": [["F", 1]],
 }
 
-short_distance = dijkstra(G, "E", "C")
-print(short_distance)  # E -- 3 --> F -- 3 --> C == 6
 
-short_distance = dijkstra(G2, "E", "F")
-print(short_distance)  # E -- 3 --> F == 3
-
-short_distance = dijkstra(G3, "E", "F")
-print(short_distance)  # E -- 2 --> G -- 1 --> F == 3
+#short_distance = dijkstra(G2, "E", "F")
+#print(short_distance)  # E -- 3 --> F == 3
+#
+#short_distance = dijkstra(G3, "E", "F")
+#print(short_distance)  # E -- 2 --> G -- 1 --> F == 3
 
 if __name__ == "__main__":
-    import doctest
+    #import doctest
+    #doctest.testmod()
 
-    doctest.testmod()
+    #short_distance = dijkstra(G, "E", "C")
+    #print(short_distance)  # E -- 3 --> F -- 3 --> C == 6
+
+    short_distance = dijkstra(G4, "START", "FIN")
+    print(short_distance)  # E -- 3 --> F -- 3 --> C == 6

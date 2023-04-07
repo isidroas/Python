@@ -139,6 +139,7 @@ if __name__ == "__main__":
     f = [[0] * (w + 1)] + [[0] + [-1] * (w + 1) for _ in range(n + 1)]
     optimal_solution, _ = knapsack(w, wt, val, n)
     print(optimal_solution)
+    print(_)
     print(mf_knapsack(n, wt, val, w))  # switched the n and w
 
     # testing the dynamic programming problem with example
