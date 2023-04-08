@@ -1,5 +1,6 @@
 from binascii import hexlify
 from hashlib import sha256
+from pprint import pprint
 from os import urandom
 
 # RFC 3526 - More Modular Exponential (MODP) Diffie-Hellman groups for
@@ -262,6 +263,29 @@ class DiffieHellman:
 
 
 if __name__ == "__main__":
-    import doctest
+    alice = DiffieHellman()
+    bob = DiffieHellman()
 
-    doctest.testmod()
+    alice_private = alice.get_private_key()
+    alice_public = alice.generate_public_key()
+
+    bob_private = bob.get_private_key()
+    bob_public = bob.generate_public_key()
+
+    # generating shared key using the DH object
+    alice_shared = alice.generate_shared_key(bob_public)
+    bob_shared = bob.generate_shared_key(alice_public)
+
+    assert alice_shared == bob_shared
+
+    # generating shared key using static methods
+    alice_shared = DiffieHellman.generate_shared_key_static(
+        alice_private, bob_public
+    )
+    bob_shared = DiffieHellman.generate_shared_key_static(
+        bob_private, alice_public
+    )
+
+    assert alice_shared == bob_shared
+
+    print(f'{alice_private=}\n\n{bob_private=}\n\n{bob_public=}\n\n{alice_public=}')
