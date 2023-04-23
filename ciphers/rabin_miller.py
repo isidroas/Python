@@ -4,6 +4,16 @@ import random
 
 
 def rabin_miller(num: int) -> bool:
+    """
+    Returns composite  or 'probaly prime'
+    #>>> rabin_miller(12) fails
+    #False
+
+    >>> rabin_miller(13)
+    True
+    """
+    assert num %2, 'must be an odd integer'
+
     s = num - 1
     t = 0
 
@@ -26,6 +36,12 @@ def rabin_miller(num: int) -> bool:
 
 
 def is_prime_low_num(num: int) -> bool:
+    """
+    >>> is_prime_low_num(13)
+    True
+    >>> is_prime_low_num(12)
+    False
+    """
     if num < 2:
         return False
 
@@ -211,6 +227,11 @@ def is_prime_low_num(num: int) -> bool:
 
 
 def generate_large_prime(keysize: int = 1024) -> int:
+    """
+    >>> random.seed('for test repeability')
+    >>> generate_large_prime(8)
+    241
+    """
     while True:
         num = random.randrange(2 ** (keysize - 1), 2 ** (keysize))
         if is_prime_low_num(num):
