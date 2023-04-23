@@ -1,36 +1,44 @@
 import os
 import sys
 
-from . import rsa_key_generator as rkg
+import rsa_key_generator as rkg
 
 DEFAULT_BLOCK_SIZE = 128
 BYTE_SIZE = 256
 
 
 def get_blocks_from_text(
-    message: str, block_size: int = DEFAULT_BLOCK_SIZE
+        message: str, block_size: int = DEFAULT_BLOCK_SIZE, byte_size = BYTE_SIZE
 ) -> list[int]:
+    """
+    >>> get_blocks_from_text('0123' '4567' '89',4, 8)
+    [29752, 32092, 512]
+    """
     message_bytes = message.encode("ascii")
 
     block_ints = []
     for block_start in range(0, len(message_bytes), block_size):
         block_int = 0
         for i in range(block_start, min(block_start + block_size, len(message_bytes))):
-            block_int += message_bytes[i] * (BYTE_SIZE ** (i % block_size))
+            block_int += message_bytes[i] * (byte_size ** (i % block_size))
         block_ints.append(block_int)
     return block_ints
 
 
 def get_text_from_blocks(
-    block_ints: list[int], message_length: int, block_size: int = DEFAULT_BLOCK_SIZE
+        block_ints: list[int], message_length: int, block_size: int = DEFAULT_BLOCK_SIZE, byte_size=BYTE_SIZE
 ) -> str:
+    """
+    >>> get_text_from_blocks([29752, 32092, 512],10, 4, 8)
+    '0123456789'
+    """
     message: list[str] = []
     for block_int in block_ints:
         block_message: list[str] = []
         for i in range(block_size - 1, -1, -1):
             if len(message) + i < message_length:
-                ascii_number = block_int // (BYTE_SIZE**i)
-                block_int = block_int % (BYTE_SIZE**i)
+                ascii_number = block_int // (byte_size**i)
+                block_int = block_int % (byte_size**i)
                 block_message.insert(0, chr(ascii_number))
         message.extend(block_message)
     return "".join(message)
@@ -39,6 +47,10 @@ def get_text_from_blocks(
 def encrypt_message(
     message: str, key: tuple[int, int], block_size: int = DEFAULT_BLOCK_SIZE
 ) -> list[int]:
+    """
+    >>> encrypt_message('0123456789', (46513, 197), 2)
+    [32057, 37923, 33773, 45215, 21749]
+    """
     encrypted_blocks = []
     n, e = key
 
@@ -53,6 +65,10 @@ def decrypt_message(
     key: tuple[int, int],
     block_size: int = DEFAULT_BLOCK_SIZE,
 ) -> str:
+    """
+    >>> decrypt_message( [32057, 37923, 33773, 45215, 21749], 10, (46513, 2573), 2)
+    '0123456789'
+    """
     decrypted_blocks = []
     n, d = key
     for block in encrypted_blocks:
