@@ -14,7 +14,7 @@ def main() -> None:
 
 def generate_key(key_size: int) -> tuple[tuple[int, int], tuple[int, int]]:
     """
-    >>> random.seed('for test repeability')
+    >>> random.seed(0) # for repeatability
     >>> public_key, private_key = generate_key(8)
     >>> public_key
     (46513, 197)
@@ -38,10 +38,14 @@ def generate_key(key_size: int) -> tuple[tuple[int, int], tuple[int, int]]:
     private_key = (n, d)
     return (public_key, private_key)
 
+
 def serialize_key(n, key, key_size):
     return f"{key_size},{n},{key}"
+
+
 def parse_key(contents: str):
-    return contents.split(',')
+    return contents.split(",")
+
 
 def make_key_files(name: str, key_size: int) -> None:
     if os.path.exists(f"{name}_pubkey.txt") or os.path.exists(f"{name}_privkey.txt"):
