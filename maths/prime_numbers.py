@@ -24,7 +24,7 @@ def slow_primes(max_n: int) -> Generator[int, None, None]:
     for i in (n for n in numbers if n > 1):
         for j in range(2, i):
             if (i % j) == 0:
-                break
+                break # refactor like this https://stackoverflow.com/a/189685
         else:
             yield i
 
@@ -47,8 +47,8 @@ def primes(max_n: int) -> Generator[int, None, None]:
     >>> list(primes(1000))[-1]
     997
     """
-    numbers: Generator = (i for i in range(1, (max_n + 1)))
-    for i in (n for n in numbers if n > 1):
+    numbers: Iterator = range(2, max_n + 1)
+    for i in numbers:
         # only need to check for factors up to sqrt(i)
         bound = int(math.sqrt(i)) + 1
         for j in range(2, bound):

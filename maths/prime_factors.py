@@ -19,7 +19,7 @@ def prime_factors(n: int) -> list[int]:
     []
     >>> prime_factors(0.02)
     []
-    >>> x = prime_factors(10**241) # doctest: +NORMALIZE_WHITESPACE
+    >>> x = prime_factors(10**241)
     >>> x == [2]*241 + [5]*241
     True
     >>> prime_factors(10**-354)
@@ -36,7 +36,7 @@ def prime_factors(n: int) -> list[int]:
     """
     i = 2
     factors = []
-    while i * i <= n:
+    while i * i <= n or n==1:
         if n % i:
             i += 1
         else:

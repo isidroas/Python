@@ -34,7 +34,7 @@ def modular_exponential(base: int, power: int, mod: int):
 
 def main():
     """Call Modular Exponential Function."""
-    print(modular_exponential(3, 200, 13))
+    print(modular_exponential(1269380576, 374, 34))
 
 
 if __name__ == "__main__":

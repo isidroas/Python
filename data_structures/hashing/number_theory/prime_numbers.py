@@ -47,13 +47,23 @@ def is_prime(number: int) -> bool:
     return not any(not number % i for i in odd_numbers)
 
 
-def next_prime(value, factor=1, **kwargs):
+def next_prime(value, factor=1, desc=False):
+    """
+    >>> next_prime(8)
+    11
+    >>> next_prime(8, factor=2)
+    17
+    >>> next_prime(8, factor=3)
+    29
+    >>> next_prime(8, desc=True)
+    7
+    """
     value = factor * value
     first_value_val = value
 
     while not is_prime(value):
-        value += 1 if not ("desc" in kwargs and kwargs["desc"] is True) else -1
+        value += 1 if not desc else -1
 
     if value == first_value_val:
-        return next_prime(value + 1, **kwargs)
+        return next_prime(value + 1, desc=desc)
     return value

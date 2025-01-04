@@ -33,6 +33,7 @@ def encrypt_message(key: int, message: str) -> str:
         while pointer < len(message):
             cipher_text[col] += message[pointer]
             pointer += key
+    print(cipher_text)
     return "".join(cipher_text)
 
 
@@ -67,4 +68,4 @@ if __name__ == "__main__":
     import doctest
 
     doctest.testmod()
-    main()
+    # main()
