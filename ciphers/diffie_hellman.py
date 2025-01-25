@@ -202,6 +202,32 @@ class DiffieHellman:
 
     >>> alice_shared == bob_shared
     True
+
+
+    #### Wikipedia example ####
+    https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange#Cryptographic_explanation
+    >>> prime=23
+    >>> generator=5
+
+    >>> from unittest.mock import patch
+    >>> with patch('random.getrandbits', return_value = 4):
+    ...     alice = DiffieHellman(prime, generator)
+    >>> with patch('random.getrandbits', return_value = 3):
+    ...     bob = DiffieHellman(prime, generator)
+
+    >>> alice.public_key
+    4
+    >>> bob.generate_shared_key(4)
+    18
+    >>> bob.public_key
+    10
+
+    Skip validation. Example didn't follow the recommendation that `generator`
+    should be an square.
+    >>> with patch.object(alice, 'is_valid_public_key', return_value = True):
+    ...     alice.generate_shared_key(10)
+    18
+
     """
 
     def __init__(self, prime: int, generator: int) -> None:
