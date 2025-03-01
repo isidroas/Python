@@ -1,3 +1,54 @@
+"""
+rename this to in-place quick sort. Ya que Lomuto no es 3 way partition
+
+"""
+
+
+def three_way_partition(
+    list_, mid_value: int, start=0, end=None
+) -> ("low:int", "high:int"):
+    """
+    >>> partition = three_way_partition
+    >>> l = [9, 5, 5, 0, 9, 0, 0, 5, 0, 9, 5]
+    >>> low, high = partition(l, 5)
+    >>> low
+    4
+    >>> high
+    7
+    >>> l
+    [0, 0, 0, 0, 5, 5, 5, 5, 9, 9, 9]
+
+                 ^           ^
+                low         high
+
+    more general than flag problem:
+
+    >>> l = [8, 5, 3, 5, 9, 0, 2, 1, 7, 5, 5]
+    >>> r = partition(l, 5)
+    >>> l
+    [3, 0, 2, 1, 5, 5, 5, 5, 7, 9, 8]
+    >>> r
+    (4, 7)
+
+    It is stable? lt part yes, be no
+    """
+    if end is None:
+        end = len(list_) - 1
+    low = mid = start
+    high = end
+    while mid <= high:
+        if list_[mid] < mid_value:
+            list_[low], list_[mid] = list_[mid], list_[low]
+            low += 1
+            mid += 1
+        elif list_[mid] > mid_value:
+            list_[high], list_[mid] = list_[mid], list_[high]
+            high -= 1
+        else:
+            mid += 1
+    return low, high
+
+
 def quick_sort_3partition(sorting: list, left: int, right: int) -> None:
     """ "
     Python implementation of quick sort algorithm with 3-way partition.
@@ -24,21 +75,13 @@ def quick_sort_3partition(sorting: list, left: int, right: int) -> None:
     """
     if right <= left:
         return
-    a = i = left
-    b = right
+
+    # any other could also work
     pivot = sorting[left]
-    while i <= b:
-        if sorting[i] < pivot:
-            sorting[a], sorting[i] = sorting[i], sorting[a]
-            a += 1
-            i += 1
-        elif sorting[i] > pivot:
-            sorting[b], sorting[i] = sorting[i], sorting[b]
-            b -= 1
-        else:
-            i += 1
-    quick_sort_3partition(sorting, left, a - 1)
-    quick_sort_3partition(sorting, b + 1, right)
+
+    low, high = three_way_partition(sorting, pivot, start=left, end=right)
+    quick_sort_3partition(sorting, left, low - 1)
+    quick_sort_3partition(sorting, high + 1, right)
 
 
 def quick_sort_lomuto_partition(sorting: list, left: int, right: int) -> None:
@@ -67,24 +110,71 @@ def quick_sort_lomuto_partition(sorting: list, left: int, right: int) -> None:
     [-4, -2, 0, 5]
     """
     if left < right:
-        pivot_index = lomuto_partition(sorting, left, right)
-        quick_sort_lomuto_partition(sorting, left, pivot_index - 1)
-        quick_sort_lomuto_partition(sorting, pivot_index + 1, right)
+        pivot_index = right
+        pivot_index_final = lomuto_partition(sorting, pivot_index, left, right)
+        quick_sort_lomuto_partition(sorting, left, pivot_index_final - 1)
+        quick_sort_lomuto_partition(sorting, pivot_index_final + 1, right)
 
 
-def lomuto_partition(sorting: list, left: int, right: int) -> int:
+def lomuto_partition(
+    sorting: list, pivot_index: int, start: int = 0, end: int = None
+) -> int:
     """
-    Example:
-    >>> lomuto_partition([1,5,7,6], 0, 3)
+    Returns the new pivot position. So that bigger or equal elements to the right.
+
+
+    # >>> l = [1,5,7,6]
+
+    >>> list_unsorted = [7, 3, 5, 4, 1, 8, 6]
+
+    Choose pivot l[3] == 4
+
+    >>> l = list_unsorted.copy()
+    >>> lomuto_partition(l, 3)
     2
+    >>> l
+    [3, 1, 4, 6, 7, 8, 5]
+
+    2 is the definitive position of the pivot
+    Notice that is not stable. Aun que parece que la parte lt sí.
+
+    Corner cases:
+    >>> l = list_unsorted.copy()
+
+    pivot l[4] == 8 == max(l)
+
+    or
+
+    >>> max(l)
+    8
+    >>> l[5]
+    8
+
+    >>> lomuto_partition(l, 5)
+    6
+
+    >>> l = list_unsorted.copy()
+    >>> min(l)
+    1
+    >>> l[4]
+    1
+    >>> lomuto_partition(l, 4)
+    0
+
+    Out of bounds ? -> imposible por el pivot. Más bien sería el dutch algorithm
     """
-    pivot = sorting[right]
-    store_index = left
-    for i in range(left, right):
+    if end is None:
+        end = len(sorting) - 1
+    pivot = sorting[pivot_index]
+
+    # en realidad no hace falta guardar pivot...
+    sorting[end], sorting[pivot_index] = sorting[pivot_index], sorting[end]
+    store_index = start  # rename first bigger_or_equal. first_be
+    for i in range(start, end):
         if sorting[i] < pivot:
             sorting[store_index], sorting[i] = sorting[i], sorting[store_index]
             store_index += 1
-    sorting[right], sorting[store_index] = sorting[store_index], sorting[right]
+    sorting[end], sorting[store_index] = sorting[store_index], sorting[end]
     return store_index
 
 
