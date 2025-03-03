@@ -249,7 +249,7 @@ def hoare_partition_by_value(
     # return last_lt
 
 
-def hoare_partition_by_pivot(array, pivot_index, start=0, end=None):
+def hoare_partition_by_pivot(array: list, pivot_index, start=0, end=None):
     """
     Setup
     >>> import random
@@ -279,12 +279,11 @@ def hoare_partition_by_pivot(array, pivot_index, start=0, end=None):
 
     pivot_value = array[pivot_index]
 
-    # swap:  pivot_index <==> end
     swap(pivot_index, end)
-
-    ge = hoare_partition_by_value(array, pivot_value, start=start, end=end - 1)  # or be
-    # TODO if out of bounds? -> index error. Bueno, con end+1 esté dentro de lista... no. Bueno, en realidad (end+1)-1 hace un swap en el mismo sitio.
-    swap(end, ge)
+    ge = hoare_partition_by_value(array, pivot_value, start=start, end=end - 1)
+    swap(
+        end, ge
+    )  # TODO if out of bounds? -> index error. Bueno, con end+1 esté dentro de lista... no. Bueno, en realidad (end+1)-1 hace un swap en el mismo sitio.
     return ge
 
 
@@ -293,19 +292,23 @@ def hoare_partition_by_pivot(array, pivot_index, start=0, end=None):
 import random
 
 
-def quicksort_hoare(l, start=0, end=None):
+def quicksort_hoare(array: list, start=0, end=None):
     """
-    este es el de donald knuth.
+    Quicksort using the Hoare partition scheme:
+    - https://en.wikipedia.org/wiki/Quicksort#Hoare_partition_scheme
+    - The Art of Computer Programming, Volume 3: Sorting and Searching, Section 5.2.2: Sorting by Exchanging
     """
     if end is None:
-        end = len(l) - 1
+        end = len(array) - 1
 
     if end + 1 - start <= 1:
         return
     pivot_index = random.randrange(start, end)
-    pivot_index_final = hoare_partition_by_pivot(l, pivot_index, start=start, end=end)
-    quicksort_hoare(l, start, pivot_index_final - 1)
-    quicksort_hoare(l, pivot_index_final + 1, end)
+    pivot_index_final = hoare_partition_by_pivot(
+        array, pivot_index, start=start, end=end
+    )
+    quicksort_hoare(array, start, pivot_index_final - 1)
+    quicksort_hoare(array, pivot_index_final + 1, end)
 
 
 # TODO: rename l -> array?
