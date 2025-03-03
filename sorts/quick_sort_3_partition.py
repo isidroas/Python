@@ -178,8 +178,6 @@ def lomuto_partition(
     return store_index
 
 
-# from snoop import snoop
-# @snoop
 def hoare_partition_by_value(
     array: list, pivot_value: int, start: int = 0, end: int = None
 ):
@@ -209,6 +207,7 @@ def hoare_partition_by_value(
     if end is None:
         end = len(array) - 1
 
+    # TODO: better names
     # invariant: all(i < pivot_value  for i in array[start : last_lt])
     last_lt = start  # -1?
     # invariant: all(i >= pivot_value  for i in array[first_ge+1 :end])
@@ -224,7 +223,7 @@ def hoare_partition_by_value(
     while True:
         while array[last_lt] < pivot_value:
             last_lt += 1
-            if last_lt > end: # por qué nadie hace esto y le funciona?
+            if last_lt > end:  # por qué nadie hace esto y le funciona?
                 # signal that lt subarray is empty with out of bounds
                 return end + 1
         while (
@@ -240,11 +239,11 @@ def hoare_partition_by_value(
 
         swap(last_lt, first_ge)
 
+        # optional optimization
         last_lt += 1
         first_ge -= 1
 
     return first_ge + 1
-    # return last_lt
 
 
 def hoare_partition_by_pivot(array: list, pivot_index, start=0, end=None):
@@ -301,6 +300,7 @@ def quicksort_hoare(array: list, start=0, end=None):
 
     if end + 1 - start <= 1:
         return
+    # TODO: random: bad for tests
     pivot_index = random.randrange(start, end)
     pivot_index_final = hoare_partition_by_pivot(
         array, pivot_index, start=start, end=end
