@@ -122,14 +122,13 @@ def lomuto_partition(
     """
     Returns the new pivot position. So that bigger or equal elements to the right.
 
-
-    # >>> l = [1,5,7,6]
-
     >>> list_unsorted = [7, 3, 5, 4, 1, 8, 6]
 
     Choose pivot l[3] == 4
 
     >>> l = list_unsorted.copy()
+    >>> l[3]
+    4
     >>> lomuto_partition(l, 3)
     2
     >>> l
@@ -178,6 +177,114 @@ def lomuto_partition(
     return store_index
 
 
+# from snoop import snoop
+# @snoop
+def hoare_partition_by_value(
+    l: list, pivot_value: int, start: int = 0, end: int = None
+):
+    """
+    >>> list_unsorted = [7, 3, 5, 4, 1, 8, 6]
+
+    >>> l = list_unsorted.copy()
+    >>> hoare_partition_by_value(l, 5)
+    3
+    >>> l
+    [1, 3, 4, 5, 7, 8, 6]
+
+
+    TODO: test no existence
+
+    >>> hoare_partition_by_value(list_unsorted.copy(), 0)
+    0
+    >>> hoare_partition_by_value(list_unsorted.copy(), 1)
+    0
+    >>> hoare_partition_by_value(list_unsorted.copy(), 2)
+    1
+    >>> hoare_partition_by_value(list_unsorted.copy(), 8)
+    6
+    >>> hoare_partition_by_value(list_unsorted.copy(), 9)
+    7
+
+    TODO: test len=0,1,2
+    """
+    if end is None:
+        end = len(l) - 1
+    last_lt = start  # -1?
+    first_ge = end
+
+    def swap(i1, i2):
+        l[i1], l[i2] = l[i2], l[i1]
+
+    # while last_lt<first_ge-1:
+    # while first_ge-last_lt > 1:
+    while True:
+        while l[last_lt] < pivot_value:
+            last_lt += 1
+            if last_lt > end:
+                # return last_lt
+                return end + 1  # signal out of bounds
+        while l[first_ge] >= pivot_value:
+            first_ge -= 1
+            if first_ge < start:
+                return start
+
+        # if first_ge-last_lt > 1:
+        if last_lt > first_ge:
+            break
+
+        swap(last_lt, first_ge)
+
+    return first_ge + 1
+    # return last_lt
+
+
+# TODO: o llamarlo hoare_partition_by_pivot
+# lo mismo se aplica a loupo en realidad
+def hoare_partition(l, pivot_index, start=0, end=None):
+    """
+    >>> import random
+
+    # >>> l_unsorted = [random.randrange(100) for _ in range(1000)]
+
+    >>> l_unsorted = [7, 3, 5, 4, 1, 8, 6]
+
+    >>> l = l_unsorted.copy()
+    >>> pivot_index = random.randrange(len(l))
+    >>> pivot_index = 5
+    >>> pivot_value = l[pivot_index]
+    >>> new_pivot_index = hoare_partition(l, pivot_index)
+
+    >>> new_pivot_index
+    6
+    >>> pivot_value
+    8
+    >>> l
+    [7, 3, 5, 4, 1, 6, 8]
+    >>> l[new_pivot_index] == l_unsorted[pivot_index]
+    True
+    >>> all(i <  pivot_value for i in l[:new_pivot_index])
+    True
+    >>> all(i >= pivot_value for i in l[new_pivot_index:])
+    True
+    """
+    if end is None:
+        end = len(l) - 1
+
+    def swap(i1, i2):
+        l[i1], l[i2] = l[i2], l[i1]
+
+    pivot_value = l[pivot_index]
+    swap(pivot_index, end)  # or right
+    ge = hoare_partition_by_value(l, pivot_value, start=start, end=end - 1)  # or be
+    # print(f'{ge=}')
+    # TODO if out of bounds? -> index error. Bueno, con end+1 esté dentro de lista... no. Bueno, en realidad (end+1)-1 hace un swap en el mismo sitio.
+    swap(end, ge)  # or be
+    return ge
+
+
+# hoare_partition.__doc__ = lomuto_partition.__doc__.replace('lomuto', 'hoare')
+
+
 def three_way_radix_quicksort(sorting: list) -> list:
     """
     Three-way radix quicksort:
@@ -206,9 +313,9 @@ def three_way_radix_quicksort(sorting: list) -> list:
 if __name__ == "__main__":
     import doctest
 
-    doctest.testmod(verbose=True)
+    # doctest.testmod(verbose=True)
 
-    user_input = input("Enter numbers separated by a comma:\n").strip()
-    unsorted = [int(item) for item in user_input.split(",")]
-    quick_sort_3partition(unsorted, 0, len(unsorted) - 1)
-    print(unsorted)
+    # user_input = input("Enter numbers separated by a comma:\n").strip()
+    # unsorted = [int(item) for item in user_input.split(",")]
+    # quick_sort_3partition(unsorted, 0, len(unsorted) - 1)
+    # print(unsorted)
