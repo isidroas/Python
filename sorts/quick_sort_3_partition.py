@@ -184,6 +184,8 @@ def hoare_partition_by_value(
     array: list, pivot_value: int, start: int = 0, end: int = None
 ):
     """
+    It returns the beginning position of the right subarray, the one that contains the elements bigger or equal than the `pivot_value`.
+
     >>> list_unsorted = [7, 3, 5, 4, 1, 8, 6]
 
     >>> array = list_unsorted.copy()
@@ -192,7 +194,7 @@ def hoare_partition_by_value(
     >>> array
     [1, 3, 4, 5, 7, 8, 6]
 
-
+    Edge cases:
     >>> hoare_partition_by_value(list_unsorted.copy(), 0)
     0
     >>> hoare_partition_by_value(list_unsorted.copy(), 1)
@@ -203,8 +205,6 @@ def hoare_partition_by_value(
     6
     >>> hoare_partition_by_value(list_unsorted.copy(), 9)
     7
-
-    TODO: test len=0,1,2
     """
     if end is None:
         end = len(array) - 1
@@ -221,12 +221,10 @@ def hoare_partition_by_value(
     def swap(i1, i2):
         array[i1], array[i2] = array[i2], array[i1]
 
-    # while last_lt<first_ge-1:
-    # while first_ge-last_lt > 1:
     while True:
         while array[last_lt] < pivot_value:
             last_lt += 1
-            if last_lt > end:
+            if last_lt > end: # por qué nadie hace esto y le funciona?
                 # signal that lt subarray is empty with out of bounds
                 return end + 1
         while (
