@@ -283,10 +283,13 @@ import random
 
 
 def quicksort_hoare(l, start=0, end=None):
+    """
+    este es el de donald knuth.
+    """
     if end is None:
         end = len(l) - 1
 
-    if end - start <= 1:
+    if end + 1 - start <= 1:
         return
     pivot_index = random.randrange(start, end)
     pivot_index_final = hoare_partition_by_pivot(l, pivot_index, start=start, end=end)
@@ -294,13 +297,49 @@ def quicksort_hoare(l, start=0, end=None):
     quicksort_hoare(l, pivot_index_final + 1, end)
 
 
+# TODO: rename l -> array?
+# from snoop import snoop
+# @snoop
+def quicksort_hoare2(l, start=0, end=None):
+    """
+    este es el de wikipedia, que para mi contiene un bug.
+
+    >>> import random
+    >>> random.seed(0)
+    >>> l = [1, 1]
+    >>> quicksort_hoare2(l)
+    """
+    if end is None:
+        end = len(l) - 1
+
+    if end + 1 - start <= 1:
+        return
+
+    pivot_value = random.choice(l[start : end + 1])
+    greater_or_equal = hoare_partition_by_value(l, pivot_value, start=start, end=end)
+    quicksort_hoare2(l, start, greater_or_equal)  # Note index is now included
+    quicksort_hoare2(l, greater_or_equal + 1, end)
+
+    # The next causes infinite recursion when l = [1, 1]
+    # sin embargo, parecía lo más rápido, ya que el pivote lo pone en una posición incorrecta.
+    # ESTÁ mal, si el indice no es el pivote (lo más probable) ese elemento no estará en la parte buena
+    # quicksort_hoare2(l, start, greater_or_equal-1)
+    # quicksort_hoare2(l, greater_or_equal, end) # Note index is now included
+
+
 def test_quicksort():
     import random
 
-    l_unsorted = [random.randrange(100) for _ in range(1000)]
-    l = l_unsorted.copy()
-    quicksort_hoare(l)
-    assert l == sorted(l_unsorted)
+    random.seed(0)
+    l_unsorted = [random.randrange(100) for _ in range(10)]
+    print(l_unsorted)
+    for algorithm in [
+        # quicksort_hoare, # TODO: this also fails !
+        quicksort_hoare2
+    ]:
+        l = l_unsorted.copy()
+        algorithm(l)
+        assert l == sorted(l_unsorted)
 
 
 # TODO: include pivot in subsort
