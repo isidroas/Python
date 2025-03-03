@@ -116,6 +116,7 @@ def quick_sort_lomuto_partition(sorting: list, left: int, right: int) -> None:
         quick_sort_lomuto_partition(sorting, pivot_index_final + 1, right)
 
 
+# TODO: puedo separar by_value y by_pivot
 def lomuto_partition(
     sorting: list, pivot_index: int, start: int = 0, end: int = None
 ) -> int:
@@ -180,15 +181,15 @@ def lomuto_partition(
 # from snoop import snoop
 # @snoop
 def hoare_partition_by_value(
-    l: list, pivot_value: int, start: int = 0, end: int = None
+    array: list, pivot_value: int, start: int = 0, end: int = None
 ):
     """
     >>> list_unsorted = [7, 3, 5, 4, 1, 8, 6]
 
-    >>> l = list_unsorted.copy()
-    >>> hoare_partition_by_value(l, 5)
+    >>> array = list_unsorted.copy()
+    >>> hoare_partition_by_value(array, 5)
     3
-    >>> l
+    >>> array
     [1, 3, 4, 5, 7, 8, 6]
 
 
@@ -206,7 +207,7 @@ def hoare_partition_by_value(
     TODO: test len=0,1,2
     """
     if end is None:
-        end = len(l) - 1
+        end = len(array) - 1
 
     # invariant: all(i < pivot_value  for i in array[start : last_lt])
     last_lt = start  # -1?
@@ -214,22 +215,22 @@ def hoare_partition_by_value(
     # lllllluuuuuurrrrrr
     #       ^    ^
     #       |    |
-    #    last_l  first_be
+    #    last_array  first_be
     first_ge = end
 
     def swap(i1, i2):
-        l[i1], l[i2] = l[i2], l[i1]
+        array[i1], array[i2] = array[i2], array[i1]
 
     # while last_lt<first_ge-1:
     # while first_ge-last_lt > 1:
     while True:
-        while l[last_lt] < pivot_value:
+        while array[last_lt] < pivot_value:
             last_lt += 1
             if last_lt > end:
                 # signal that lt subarray is empty with out of bounds
                 return end + 1
         while (
-            l[first_ge] >= pivot_value
+            array[first_ge] >= pivot_value
         ):  # TODO: por qué en todos no es inclusiva esta comparación? Entre ellos donald knuth y wikipedia
             first_ge -= 1
             if first_ge < start:
@@ -248,38 +249,40 @@ def hoare_partition_by_value(
     # return last_lt
 
 
-# TODO: o llamarlo hoare_partition_by_pivot
-# lo mismo se aplica a loupo en realidad
-def hoare_partition_by_pivot(l, pivot_index, start=0, end=None):
+def hoare_partition_by_pivot(array, pivot_index, start=0, end=None):
     """
+    Setup
     >>> import random
-    >>> l_unsorted = [random.randrange(100) for _ in range(1000)]
-    >>> l = l_unsorted.copy()
-    >>> pivot_index = random.randrange(len(l))
-    >>> pivot_value = l[pivot_index]
-    >>> new_pivot_index = hoare_partition_by_pivot(l, pivot_index)
+    >>> array_unsorted = [random.randrange(100) for _ in range(1000)]
+    >>> array = array_unsorted.copy()
+    >>> pivot_index = random.randrange(len(array))
+    >>> pivot_value = array[pivot_index]
 
-    >>> l[new_pivot_index] == l_unsorted[pivot_index]
+    Execution
+    >>> new_pivot_index = hoare_partition_by_pivot(array, pivot_index)
+
+    Validation
+    >>> array[new_pivot_index] == array_unsorted[pivot_index]
     True
-    >>> all(i <  pivot_value for i in l[:new_pivot_index])
+    >>> all(i <  pivot_value for i in array[:new_pivot_index])
     True
-    >>> all(i >= pivot_value for i in l[new_pivot_index:])
+    >>> all(i >= pivot_value for i in array[new_pivot_index:])
     True
     """
     # TODO: move test to main? to prove all partitions-> not in CI. Move to module docstring?
 
     if end is None:
-        end = len(l) - 1
+        end = len(array) - 1
 
     def swap(i1, i2):
-        l[i1], l[i2] = l[i2], l[i1]
+        array[i1], array[i2] = array[i2], array[i1]
 
-    pivot_value = l[pivot_index]
+    pivot_value = array[pivot_index]
 
     # swap:  pivot_index <==> end
     swap(pivot_index, end)
 
-    ge = hoare_partition_by_value(l, pivot_value, start=start, end=end - 1)  # or be
+    ge = hoare_partition_by_value(array, pivot_value, start=start, end=end - 1)  # or be
     # TODO if out of bounds? -> index error. Bueno, con end+1 esté dentro de lista... no. Bueno, en realidad (end+1)-1 hace un swap en el mismo sitio.
     swap(end, ge)
     return ge
@@ -287,7 +290,6 @@ def hoare_partition_by_pivot(l, pivot_index, start=0, end=None):
 
 # hoare_partition.__doc__ = lomuto_partition.__doc__.replace('lomuto', 'hoare')
 
-# TODO: quicksort_hoare.
 import random
 
 
