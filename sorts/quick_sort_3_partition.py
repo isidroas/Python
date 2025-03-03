@@ -192,8 +192,6 @@ def hoare_partition_by_value(
     [1, 3, 4, 5, 7, 8, 6]
 
 
-    TODO: test no existence
-
     >>> hoare_partition_by_value(list_unsorted.copy(), 0)
     0
     >>> hoare_partition_by_value(list_unsorted.copy(), 1)
@@ -221,8 +219,8 @@ def hoare_partition_by_value(
         while l[last_lt] < pivot_value:
             last_lt += 1
             if last_lt > end:
-                # return last_lt
-                return end + 1  # signal out of bounds
+                # signal that lt subarray is empty with out of bounds
+                return end + 1
         while l[first_ge] >= pivot_value:
             first_ge -= 1
             if first_ge < start:
@@ -234,32 +232,24 @@ def hoare_partition_by_value(
 
         swap(last_lt, first_ge)
 
+        last_lt += 1
+        first_ge -= 1
+
     return first_ge + 1
     # return last_lt
 
 
 # TODO: o llamarlo hoare_partition_by_pivot
 # lo mismo se aplica a loupo en realidad
-def hoare_partition(l, pivot_index, start=0, end=None):
+def hoare_partition_by_pivot(l, pivot_index, start=0, end=None):
     """
     >>> import random
-
-    # >>> l_unsorted = [random.randrange(100) for _ in range(1000)]
-
-    >>> l_unsorted = [7, 3, 5, 4, 1, 8, 6]
-
+    >>> l_unsorted = [random.randrange(100) for _ in range(1000)]
     >>> l = l_unsorted.copy()
     >>> pivot_index = random.randrange(len(l))
-    >>> pivot_index = 5
     >>> pivot_value = l[pivot_index]
-    >>> new_pivot_index = hoare_partition(l, pivot_index)
+    >>> new_pivot_index = hoare_partition_by_pivot(l, pivot_index)
 
-    >>> new_pivot_index
-    6
-    >>> pivot_value
-    8
-    >>> l
-    [7, 3, 5, 4, 1, 6, 8]
     >>> l[new_pivot_index] == l_unsorted[pivot_index]
     True
     >>> all(i <  pivot_value for i in l[:new_pivot_index])
@@ -267,6 +257,8 @@ def hoare_partition(l, pivot_index, start=0, end=None):
     >>> all(i >= pivot_value for i in l[new_pivot_index:])
     True
     """
+    # TODO: move test to main? to prove all partitions-> not in CI. Move to module docstring?
+
     if end is None:
         end = len(l) - 1
 
@@ -274,15 +266,44 @@ def hoare_partition(l, pivot_index, start=0, end=None):
         l[i1], l[i2] = l[i2], l[i1]
 
     pivot_value = l[pivot_index]
-    swap(pivot_index, end)  # or right
+
+    # swap:  pivot_index <==> end
+    swap(pivot_index, end)
+
     ge = hoare_partition_by_value(l, pivot_value, start=start, end=end - 1)  # or be
-    # print(f'{ge=}')
     # TODO if out of bounds? -> index error. Bueno, con end+1 esté dentro de lista... no. Bueno, en realidad (end+1)-1 hace un swap en el mismo sitio.
-    swap(end, ge)  # or be
+    swap(end, ge)
     return ge
 
 
 # hoare_partition.__doc__ = lomuto_partition.__doc__.replace('lomuto', 'hoare')
+
+# TODO: quicksort_hoare.
+import random
+
+
+def quicksort_hoare(l, start=0, end=None):
+    if end is None:
+        end = len(l) - 1
+
+    if end - start <= 1:
+        return
+    pivot_index = random.randrange(start, end)
+    pivot_index_final = hoare_partition_by_pivot(l, pivot_index, start=start, end=end)
+    quicksort_hoare(l, start, pivot_index_final - 1)
+    quicksort_hoare(l, pivot_index_final + 1, end)
+
+
+def test_quicksort():
+    import random
+
+    l_unsorted = [random.randrange(100) for _ in range(1000)]
+    l = l_unsorted.copy()
+    quicksort_hoare(l)
+    assert l == sorted(l_unsorted)
+
+
+# TODO: include pivot in subsort
 
 
 def three_way_radix_quicksort(sorting: list) -> list:
