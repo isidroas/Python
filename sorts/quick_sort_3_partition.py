@@ -207,7 +207,14 @@ def hoare_partition_by_value(
     """
     if end is None:
         end = len(l) - 1
+
+    # invariant: all(i < pivot_value  for i in array[start : last_lt])
     last_lt = start  # -1?
+    # invariant: all(i >= pivot_value  for i in array[first_ge+1 :end])
+    # lllllluuuuuurrrrrr
+    #       ^    ^
+    #       |    |
+    #    last_l  first_be
     first_ge = end
 
     def swap(i1, i2):
@@ -221,7 +228,9 @@ def hoare_partition_by_value(
             if last_lt > end:
                 # signal that lt subarray is empty with out of bounds
                 return end + 1
-        while l[first_ge] >= pivot_value:
+        while (
+            l[first_ge] >= pivot_value
+        ):  # TODO: por qué en todos no es inclusiva esta comparación? Entre ellos donald knuth y wikipedia
             first_ge -= 1
             if first_ge < start:
                 return start
@@ -334,15 +343,24 @@ def test_quicksort():
     l_unsorted = [random.randrange(100) for _ in range(10)]
     print(l_unsorted)
     for algorithm in [
-        # quicksort_hoare, # TODO: this also fails !
-        quicksort_hoare2
+        quicksort_hoare,
+        # quicksort_hoare2
     ]:
         l = l_unsorted.copy()
         algorithm(l)
         assert l == sorted(l_unsorted)
 
 
-# TODO: include pivot in subsort
+def test_parition_by_value():
+    import random
+
+    l_unsorted = [random.randrange(100) for _ in range(1000)]
+    l = l_unsorted.copy()
+    pivot_value = random.choice(l)
+    greater_equal = hoare_partition_by_value(l, pivot_value)
+
+    assert all(i < pivot_value for i in l[:greater_equal])
+    assert all(i >= pivot_value for i in l[greater_equal:])
 
 
 def three_way_radix_quicksort(sorting: list) -> list:
