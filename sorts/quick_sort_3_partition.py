@@ -252,8 +252,6 @@ def hoare_partition_by_pivot(
     array: list, pivot_index: int, start=0, end: int | None = None
 ):
     """
-    Same as lomuto
-
     >>> array = [7, 3, 5, 4, 1, 8, 6]
     >>> array[3]
     4
@@ -272,12 +270,12 @@ def hoare_partition_by_pivot(
 
     swap(pivot_index, end)
     ge = hoare_partition_by_value(array, pivot_value, start=start, end=end - 1)
-    swap(
-        end, ge
-    )  # TODO if out of bounds? -> index error. Bueno, con end+1 esté dentro de lista... no. Bueno, en realidad (end+1)-1 hace un swap en el mismo sitio.
+    # if out of bounds? -> (end+1)-1 hace un swap en el mismo sitio.
+    swap(end, ge)
     return ge
 
 
+# no se puedo por inestabilidad:
 # hoare_partition.__doc__ = lomuto_partition.__doc__.replace('lomuto', 'hoare')
 
 
@@ -286,6 +284,11 @@ def quicksort_hoare(array: list, start=0, end=None):
     Quicksort using the Hoare partition scheme:
     - https://en.wikipedia.org/wiki/Quicksort#Hoare_partition_scheme
     - The Art of Computer Programming, Volume 3: Sorting and Searching, Section 5.2.2: Sorting by Exchanging
+
+    >>> array = [2, 2, 8, 0, 3, 7, 2, 1, 8, 8]
+    >>> quicksort_hoare(array)
+    >>> array
+    [0, 1, 2, 2, 2, 3, 7, 8, 8, 8]
     """
     if end is None:
         end = len(array) - 1
