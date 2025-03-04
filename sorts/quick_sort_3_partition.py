@@ -187,7 +187,6 @@ def hoare_partition_by_value(
     It returns the beginning position of the right subarray, the one that contains the elements bigger or equal than the `pivot_value`.
 
     >>> list_unsorted = [7, 3, 5, 4, 1, 8, 6]
-
     >>> array = list_unsorted.copy()
     >>> hoare_partition_by_value(array, 5)
     3
@@ -250,8 +249,10 @@ def hoare_partition_by_value(
 
 def hoare_partition_by_pivot(
     array: list, pivot_index: int, start=0, end: int | None = None
-):
+)-> int:
     """
+    Returns the new pivot index after partitioning
+
     >>> array = [7, 3, 5, 4, 1, 8, 6]
     >>> array[3]
     4
@@ -269,10 +270,10 @@ def hoare_partition_by_pivot(
     pivot_value = array[pivot_index]
 
     swap(pivot_index, end)
-    ge = hoare_partition_by_value(array, pivot_value, start=start, end=end - 1)
+    greater_or_equal = hoare_partition_by_value(array, pivot_value, start=start, end=end - 1)
     # if out of bounds? -> (end+1)-1 hace un swap en el mismo sitio.
-    swap(end, ge)
-    return ge
+    swap(end, greater_or_equal)
+    return greater_or_equal
 
 
 # no se puedo por inestabilidad:
