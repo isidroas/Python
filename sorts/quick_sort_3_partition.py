@@ -3,6 +3,8 @@ rename this to in-place quick sort. Ya que Lomuto no es 3 way partition
 
 """
 
+import random
+
 
 def three_way_partition(
     list_, mid_value: int, start=0, end=None
@@ -246,28 +248,20 @@ def hoare_partition_by_value(
     return first_ge + 1
 
 
-def hoare_partition_by_pivot(array: list, pivot_index, start=0, end=None):
+def hoare_partition_by_pivot(
+    array: list, pivot_index: int, start=0, end: int | None = None
+):
     """
-    Setup
-    >>> import random
-    >>> array_unsorted = [random.randrange(100) for _ in range(1000)]
-    >>> array = array_unsorted.copy()
-    >>> pivot_index = random.randrange(len(array))
-    >>> pivot_value = array[pivot_index]
+    Same as lomuto
 
-    Execution
-    >>> new_pivot_index = hoare_partition_by_pivot(array, pivot_index)
-
-    Validation
-    >>> array[new_pivot_index] == array_unsorted[pivot_index]
-    True
-    >>> all(i <  pivot_value for i in array[:new_pivot_index])
-    True
-    >>> all(i >= pivot_value for i in array[new_pivot_index:])
-    True
+    >>> array = [7, 3, 5, 4, 1, 8, 6]
+    >>> array[3]
+    4
+    >>> hoare_partition_by_pivot(array, 3)
+    2
+    >>> array
+    [1, 3, 4, 6, 7, 8, 5]
     """
-    # TODO: move test to main? to prove all partitions-> not in CI. Move to module docstring?
-
     if end is None:
         end = len(array) - 1
 
@@ -285,8 +279,6 @@ def hoare_partition_by_pivot(array: list, pivot_index, start=0, end=None):
 
 
 # hoare_partition.__doc__ = lomuto_partition.__doc__.replace('lomuto', 'hoare')
-
-import random
 
 
 def quicksort_hoare(array: list, start=0, end=None):
@@ -316,7 +308,7 @@ def quicksort_hoare2(l, start=0, end=None):
     """
     este es el de wikipedia, que para mi contiene un bug.
 
-    >>> import random
+    >>>
     >>> random.seed(0)
     >>> l = [1, 1]
     >>> quicksort_hoare2(l)
@@ -340,8 +332,6 @@ def quicksort_hoare2(l, start=0, end=None):
 
 
 def test_quicksort():
-    import random
-
     random.seed(0)
     l_unsorted = [random.randrange(100) for _ in range(10)]
     print(l_unsorted)
@@ -355,8 +345,6 @@ def test_quicksort():
 
 
 def test_parition_by_value():
-    import random
-
     l_unsorted = [random.randrange(100) for _ in range(1000)]
     l = l_unsorted.copy()
     pivot_value = random.choice(l)
@@ -364,6 +352,26 @@ def test_parition_by_value():
 
     assert all(i < pivot_value for i in l[:greater_equal])
     assert all(i >= pivot_value for i in l[greater_equal:])
+
+
+def test_partition_by_pivot():
+    # Setup
+    array_unsorted = [random.randrange(100) for _ in range(1000)]
+    pivot_index = random.randrange(len(array_unsorted))
+    pivot_value = array_unsorted[pivot_index]
+
+    for algorithm in [
+        lomuto_partition,
+        hoare_partition_by_pivot,
+    ]:
+        # Execution
+        array = array_unsorted.copy()
+        new_pivot_index = algorithm(array, pivot_index)
+
+        # Validation
+        assert array[new_pivot_index] == array_unsorted[pivot_index]
+        assert all(i < pivot_value for i in array[:new_pivot_index])
+        assert all(i >= pivot_value for i in array[new_pivot_index:])
 
 
 def three_way_radix_quicksort(sorting: list) -> list:
