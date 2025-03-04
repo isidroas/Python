@@ -181,10 +181,10 @@ def lomuto_partition(
 
 
 def hoare_partition_by_value(
-    array: list, pivot_value: int, start: int = 0, end: int = None
-):
+    array: list, pivot_value: int, start: int = 0, end: int | None = None
+) -> int:
     """
-    It returns the beginning position of the right subarray, the one that contains the elements bigger or equal than the `pivot_value`.
+    It returns the beginning position of the right subarray, the one that contains the elements bigger or equal than `pivot_value`
 
     >>> list_unsorted = [7, 3, 5, 4, 1, 8, 6]
     >>> array = list_unsorted.copy()
@@ -208,48 +208,61 @@ def hoare_partition_by_value(
     if end is None:
         end = len(array) - 1
 
-    # TODO: better names
-    # invariant: all(i < pivot_value  for i in array[start : last_lt])
-    last_lt = start  # -1?
-    # invariant: all(i >= pivot_value  for i in array[first_ge+1 :end])
-    # lllllluuuuuurrrrrr
-    #       ^    ^
-    #       |    |
-    #    last_array  first_be
-    first_ge = end
-
-    def swap(i1, i2):
-        array[i1], array[i2] = array[i2], array[i1]
+    left = start
+    right = end
 
     while True:
-        while array[last_lt] < pivot_value:
-            last_lt += 1
-            if last_lt > end:  # por qué nadie hace esto y le funciona?
-                # signal that lt subarray is empty with out of bounds
+        while array[left] < pivot_value:
+            left += 1
+            if left > end:  # por qué nadie hace esto y le funciona?
+                # signal that right subarray is empty with out of bounds
                 return end + 1
         while (
-            array[first_ge] >= pivot_value
+            array[right] >= pivot_value
         ):  # TODO: por qué en todos no es inclusiva esta comparación? Entre ellos donald knuth y wikipedia
-            first_ge -= 1
-            if first_ge < start:
+            right -= 1
+            if right < start:
+                # left subarray empty
                 return start
 
-        # if first_ge-last_lt > 1:
-        if last_lt > first_ge:
+        if left > right:
             break
 
-        swap(last_lt, first_ge)
+        # invariants (only to understand the algorithm):
+        assert all(i < pivot_value for i in array[start:left])
+        assert all(i >= pivot_value for i in array[right + 1 : end])
+        """
+        In a intermediate iteration, state could look like this:
+
+            llllllruuuulrrrrrr
+                  ^    ^
+                  |    |
+                left  right
+
+        where the middle values are [u]nknown, since the are not traversed yet.
+        `left-1` points to the end of the left subarray.
+        `rigth+1` points to the start of the right subarray.
+        """
+
+        # swap
+        array[left], array[right] = array[right], array[left]
+        """
+            llllllluuuurrrrrrr
+                  ^    ^
+                  |    |
+                left  right
+        """
 
         # optional optimization
-        last_lt += 1
-        first_ge -= 1
+        left += 1
+        right -= 1
 
-    return first_ge + 1
+    return right + 1
 
 
 def hoare_partition_by_pivot(
     array: list, pivot_index: int, start=0, end: int | None = None
-)-> int:
+) -> int:
     """
     Returns the new pivot index after partitioning
 
@@ -270,7 +283,9 @@ def hoare_partition_by_pivot(
     pivot_value = array[pivot_index]
 
     swap(pivot_index, end)
-    greater_or_equal = hoare_partition_by_value(array, pivot_value, start=start, end=end - 1)
+    greater_or_equal = hoare_partition_by_value(
+        array, pivot_value, start=start, end=end - 1
+    )
     # if out of bounds? -> (end+1)-1 hace un swap en el mismo sitio.
     swap(end, greater_or_equal)
     return greater_or_equal
@@ -296,7 +311,6 @@ def quicksort_hoare(array: list, start=0, end=None):
 
     if end + 1 - start <= 1:
         return
-    # TODO: random: bad for tests
     pivot_index = random.randrange(start, end)
     pivot_index_final = hoare_partition_by_pivot(
         array, pivot_index, start=start, end=end
