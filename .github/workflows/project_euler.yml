@@ -5,8 +5,6 @@ on:
       - "project_euler/**"
       - ".github/workflows/project_euler.yml"
       - "scripts/validate_solutions.py"
-  schedule:
-    - cron: "0 0 * * *" # Run everyday
 
 name: "Project Euler"
 
